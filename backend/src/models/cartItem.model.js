@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const cartItemSchema = new Schema(
+const cartSchema = new Schema(
   {
     user: {
       type: Schema.Types.ObjectId,
@@ -37,7 +37,7 @@ const cartItemSchema = new Schema(
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-cartItemSchema.virtual("totalPrice").get(function () {
+cartSchema.virtual("totalPrice").get(function () {
   if (!this.products || this.products.length === 0) return 0;
 
   return this.products.reduce((sum, p) => {
@@ -46,7 +46,7 @@ cartItemSchema.virtual("totalPrice").get(function () {
   });
 });
 
-cartItemSchema.pre(/^find/, function (next) {
+cartSchema.pre(/^find/, function (next) {
   this.populate({
     path: "products.product",
     select: "name price category images slug",
@@ -54,4 +54,4 @@ cartItemSchema.pre(/^find/, function (next) {
   next();
 });
 
-export const Cart = mongoose.model("Cart", cartItemSchema);
+export const Cart = mongoose.model("Cart", cartSchema);

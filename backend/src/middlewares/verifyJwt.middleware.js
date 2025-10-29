@@ -4,6 +4,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
 
 export const verifyJwt = async (req, res, next) => {
+  // console.log("Verifying JWT...");
   try {
     const token = req.cookies?.accessToken;
     if (!token) {
@@ -19,8 +20,6 @@ export const verifyJwt = async (req, res, next) => {
 
     req.user = user;
     next();
-
-    
   } catch (err) {
     throw new ApiError(401, "Unauthorized Access");
   }

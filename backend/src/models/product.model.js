@@ -9,7 +9,6 @@ const productSchema = new Schema(
     },
     description: {
       type: String,
-      required: true,
       trim: true,
     },
     price: {
@@ -26,6 +25,7 @@ const productSchema = new Schema(
     category: [
       {
         type: String,
+        enum: ["Electronics", "Clothing", "Books", "Home", "Beauty", "Sports"],
         required: true,
         trim: true,
         index: true,

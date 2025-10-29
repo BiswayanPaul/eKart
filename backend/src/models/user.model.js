@@ -25,6 +25,12 @@ const userSchema = new Schema(
       trim: true,
       index: true,
     },
+    role: {
+      type: String,
+      enum: ["customer", "admin"],
+      default: "customer",
+      required: true,
+    },
     orderHistory: [
       {
         type: Schema.Types.ObjectId,
@@ -59,6 +65,7 @@ userSchema.methods.generateAccessToken = function () {
       email: this.email,
       username: this.username,
       fullname: this.fullname,
+      role: this.role,
     },
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
