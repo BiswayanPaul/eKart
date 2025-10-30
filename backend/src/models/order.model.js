@@ -7,6 +7,11 @@ const orderSchema = new Schema(
       ref: "User",
       required: true,
     },
+    cart: {
+      type: Schema.Types.ObjectId,
+      ref: "Cart",
+      required: true,
+    },
     items: [
       {
         product: {
@@ -36,7 +41,7 @@ const orderSchema = new Schema(
     },
     orderNumber: {
       type: String,
-      default: () => `ORD-${Date.now()}`,
+      default: () => `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       unique: true,
     },
     shippingAddress: {
@@ -53,10 +58,13 @@ const orderSchema = new Schema(
 );
 
 orderSchema.pre(/^find/, function (next) {
-  this.populate("user", "username email").populate(
-    "items.product",
-    "name price category images slug"
-  );
+  this.populate({
+    path: "user",
+    select: "username email",
+  }).populate({
+    path: "items.product",
+    select: "name price category images slug",
+  });
   next();
 });
 

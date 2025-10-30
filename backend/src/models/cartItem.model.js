@@ -5,7 +5,7 @@ const cartSchema = new Schema(
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      unique: true,
+      required: true,
     },
     products: [
       {
@@ -33,8 +33,17 @@ const cartSchema = new Schema(
       enum: ["Active", "CheckedOut", "Abandoned"],
       default: "Active",
     },
+    checkoutAt: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
+);
+
+cartSchema.index(
+  { user: 1, status: 1 },
+  { unique: true, partialFilterExpression: { status: "Active" } }
 );
 
 cartSchema.virtual("totalPrice").get(function () {

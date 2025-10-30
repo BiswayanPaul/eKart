@@ -17,44 +17,47 @@ const addItemToCart = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Insufficient stock for the requested quantity");
   }
 
-  let cart = await Cart.findOne({ user: userId });
+  // 1️⃣ Ensure a single Active cart exists for the user
+  const cart = await Cart.findOneAndUpdate(
+    { user: userId, status: "Active" },
+    {
+      $setOnInsert: {
+        user: userId,
+        products: [],
+        slug: `cart-${userId}`,
+      },
+    },
+    { upsert: true, new: true, setDefaultsOnInsert: true }
+  );
 
-  if (!cart) {
-    cart = await Cart.create({
-      user: userId,
-      products: [{ product: productId, quantity }],
-      slug: `cart-${userId}`,
-    });
-  } else {
-    const itemIndex = cart.products.findIndex((p) => {
-      const pid =
-        typeof p.product === "object"
-          ? p.product._id.toString()
-          : p.product.toString();
-      return pid === productId;
-    });
-
-    if (
-      product.stock <
-      quantity + (itemIndex > -1 ? cart.products[itemIndex].quantity : 0)
-    ) {
-      throw new ApiError(400, "Insufficient stock already added in cart");
-    }
-
-    if (itemIndex > -1) {
-      cart.products[itemIndex].quantity += quantity;
-    } else {
-      cart.products.push({ product: productId, quantity });
-    }
-
-    await cart.save();
+  // 2️⃣ Ensure cart is Active before adding items
+  if (cart.status !== "Active") {
+    throw new ApiError(400, "Cannot add items to a non-active cart");
   }
 
-  await cart.populate("products.product", "name price category images slug");
+  // 3️⃣ Try to increment quantity if product already in cart
+  const incResult = await Cart.updateOne(
+    { _id: cart._id, "products.product": productId },
+    { $inc: { "products.$.quantity": quantity } }
+  );
+
+  // 4️⃣ If product wasn't present, push it
+  if (incResult.matchedCount === 0) {
+    await Cart.updateOne(
+      { _id: cart._id },
+      { $push: { products: { product: productId, quantity } } }
+    );
+  }
+
+  // 5️⃣ Return updated cart
+  const updatedCart = await Cart.findById(cart._id).populate(
+    "products.product",
+    "name price category images slug"
+  );
 
   res
     .status(200)
-    .json(new ApiResponse(200, cart, "Item added to cart successfully"));
+    .json(new ApiResponse(200, updatedCart, "Item added to cart successfully"));
 });
 
 const removeItemFromCart = asyncHandler(async (req, res) => {
@@ -150,7 +153,7 @@ const updateItemQuantity = asyncHandler(async (req, res) => {
 const getUserCart = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
-  const cart = await Cart.findOne({ user: userId }).populate(
+  const cart = await Cart.find({ user: userId }).populate(
     "products.product",
     "name price category images slug"
   );

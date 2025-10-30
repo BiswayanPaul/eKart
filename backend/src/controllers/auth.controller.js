@@ -180,4 +180,28 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     );
 });
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken };
+const getCurrentUser = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+  const user = await User.findById(_id);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+  const userData = user.toJSON();
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { user: userData },
+        "Current user fetched successfully"
+      )
+    );
+});
+
+export {
+  registerUser,
+  loginUser,
+  logoutUser,
+  refreshAccessToken,
+  getCurrentUser,
+};
