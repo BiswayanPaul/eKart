@@ -4,6 +4,7 @@ import api from "./axiosInstance.js";
 export const addToCart = async (productId, quantity = 1) => {
   try {
     const response = await api.post("/cart/add", { productId, quantity });
+    console.log("Add to Cart Response:", response.data);
     return response.data;
   } catch (error) {
     console.error("Add to Cart Failed:", error);
@@ -12,9 +13,11 @@ export const addToCart = async (productId, quantity = 1) => {
 };
 
 // Remove item from cart
-export const removeItem = async (productId) => {
+export const removeItem = async (productId, quantity) => {
   try {
-    const response = await api.delete(`/cart/remove/${productId}`);
+    const response = await api.delete(`/cart/remove/${productId}`, {
+      data: quantity,
+    });
     return response.data;
   } catch (error) {
     console.error("Remove from Cart Failed:", error);
@@ -39,6 +42,7 @@ export const updateItem = async (productId, quantity) => {
 export const getCart = async () => {
   try {
     const response = await api.get("/cart");
+    // console.log("Fetch Cart Response:", response.data);
     return response.data;
   } catch (error) {
     console.error("Fetch Cart Failed:", error);

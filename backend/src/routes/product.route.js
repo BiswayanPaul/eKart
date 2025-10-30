@@ -5,6 +5,7 @@ import {
   getProductById,
   getProducts,
   deleteProduct,
+  getAllAvailableCategories,
 } from "../controllers/product.controller.js";
 import { verifyJwt } from "../middlewares/verifyJwt.middleware.js";
 import { verifyRole } from "../middlewares/verifyRole.middleware.js";
@@ -15,5 +16,6 @@ router.put("/update/:id", verifyJwt, verifyRole, updateProduct);
 router.get("/:id", getProductById);
 router.get("/", getProducts);
 router.delete("/:id", verifyJwt, verifyRole, deleteProduct);
+router.get("/categories/all", getAllAvailableCategories);
 
 export { router as productRouter };

@@ -54,3 +54,13 @@ export const deleteProduct = async (id) => {
     throw error.response?.data || { message: "Delete product failed" };
   }
 };
+
+export const getAllAvailableCategories = async () => {
+  try {
+    const response = await api.get("/products/categories/all");
+    return response.data;
+  } catch (error) {
+    console.error("Get Categories Failed:", error);
+    throw error.response?.data || { message: "Get categories failed" };
+  }
+};

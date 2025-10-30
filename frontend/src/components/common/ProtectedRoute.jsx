@@ -4,14 +4,14 @@ import { useAuth } from "../../context/useAuth";
 const ProtectedRoute = ({ children, role }) => {
   const { user, loading, isAuthenticated } = useAuth();
 
-  console.log(
-    "ProtectedRoute - user:",
-    user,
-    "isAuthenticated:",
-    isAuthenticated,
-    "loading:",
-    loading
-  );
+  // console.log(
+  //   "ProtectedRoute - user:",
+  //   user,
+  //   "isAuthenticated:",
+  //   isAuthenticated,
+  //   "loading:",
+  //   loading
+  // );
 
   if (loading) {
     return <div>Loading...</div>;

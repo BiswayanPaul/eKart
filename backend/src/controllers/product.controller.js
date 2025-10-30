@@ -99,10 +99,17 @@ const deleteProduct = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, deletedProduct, "Product deleted successfully"));
 });
 
+
+const getAllAvailableCategories = asyncHandler(async(req,res)=>{
+    const categories = await Product.distinct("category");
+    res.status(200).json(new ApiResponse(200, categories, "Categories fetched successfully"));ß
+})
+
 export {
   addProduct,
   updateProduct,
   getProductById,
   getProducts,
   deleteProduct,
+  getAllAvailableCategories
 };
