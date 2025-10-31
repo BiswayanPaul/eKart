@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { getCurrentUser, login as loginUser } from "../API/auth";
+import { getCurrentUser } from "../API/auth";
 import { Button, Logo, Input } from "../components/index";
 import { useAuth } from "../context/useAuth";
 
@@ -9,12 +9,12 @@ function Login() {
   const navigate = useNavigate();
   const { register, handleSubmit } = useForm();
   const [error, setError] = useState("");
-  const { setUser } = useAuth();
+  const { setUser, login } = useAuth();
 
   const onSubmit = async (data) => {
     setError("");
     try {
-      const response = await loginUser(data.email, data.password);
+      const response = await login(data.email, data.password);
       console.log("Login success:", response);
 
       const current = await getCurrentUser();

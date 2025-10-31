@@ -44,6 +44,7 @@ const getCurrentUser = async () => {
 
 const refreshToken = async () => {
   try {
+    console.log("Attempting to refresh token...");
     const response = await api.post("/auth/refresh-token");
     return response.data;
   } catch (error) {

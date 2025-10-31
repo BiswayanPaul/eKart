@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
-import { getCurrentUser, logout as lougouApi } from "../API/auth";
+import {
+  getCurrentUser,
+  logout as logoutApi,
+  login as loginApi,
+} from "../API/auth";
 import { AuthContext } from "./useAuth";
 
 export const AuthProvider = ({ children }) => {
@@ -8,15 +12,25 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const fetchUser = async () => {
+      // **ONLY fetch if session flag exists**
+      const hasSession = localStorage.getItem("hasSession");
+      if (hasSession !== "1") {
+        setLoading(false);
+        return;
+      }
+
       try {
         const res = await getCurrentUser();
         console.log("Current user response:", { res });
         if (res.success) {
           setUser(res.data.user);
+        } else {
+          localStorage.removeItem("hasSession");
         }
       } catch (err) {
         console.log("Error fetching current user:", err);
         setUser(null);
+        localStorage.removeItem("hasSession");
       } finally {
         setLoading(false);
       }
@@ -24,11 +38,21 @@ export const AuthProvider = ({ children }) => {
     fetchUser();
   }, []);
 
+  const login = async (email, password) => {
+    const res = await loginApi(email, password);
+    if (res.success) {
+      setUser(res.data.user);
+      localStorage.setItem("hasSession", "1"); // **Set here on login**
+    }
+    return res;
+  };
+
   const logout = async () => {
     try {
-      await lougouApi();
+      await logoutApi();
     } finally {
       setUser(null);
+      localStorage.removeItem("hasSession");
     }
   };
 
@@ -39,6 +63,7 @@ export const AuthProvider = ({ children }) => {
         setUser,
         loading,
         isAuthenticated: !!user,
+        login,
         logout,
       }}
     >

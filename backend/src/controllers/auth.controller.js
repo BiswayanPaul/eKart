@@ -131,6 +131,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 // REFRESH TOKEN
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
+  console.log("Refresh token request received");
   const incomingRefreshToken =
     req.cookies.refreshToken || req.body.refreshToken;
 
