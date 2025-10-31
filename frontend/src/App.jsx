@@ -12,6 +12,7 @@ import { useEffect } from "react";
 import { ThemeProvider } from "./context/Theme";
 import Product from "./pages/Product";
 import Cart from "./pages/Cart";
+import Orders from "./pages/Order";
 function App() {
   const [themeMode, setThemeMode] = useState("light");
 
@@ -39,6 +40,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/product/:id" element={<Product />} />
                 <Route path="/cart" element={<Cart />} />
+                <Route path="/orders" element={<Orders />} />
                 {/* add /cart /account etc here */}
               </Route>
 

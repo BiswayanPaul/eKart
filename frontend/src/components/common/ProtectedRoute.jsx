@@ -1,17 +1,11 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../context/useAuth";
+// import "../../API/axiosInterceptor";
 
 const ProtectedRoute = ({ children, role }) => {
   const { user, loading, isAuthenticated } = useAuth();
-
-  // console.log(
-  //   "ProtectedRoute - user:",
-  //   user,
-  //   "isAuthenticated:",
-  //   isAuthenticated,
-  //   "loading:",
-  //   loading
-  // );
+  // console.log( //
+  // "ProtectedRoute - user:", // user, // "isAuthenticated:", // isAuthenticated, // "loading:", // loading // );
 
   if (loading) {
     return <div>Loading...</div>;
@@ -24,5 +18,4 @@ const ProtectedRoute = ({ children, role }) => {
   }
   return children;
 };
-
 export default ProtectedRoute;

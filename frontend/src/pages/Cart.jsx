@@ -13,13 +13,13 @@ function Cart() {
   const [msg, setMsg] = useState("");
   const [btnLoading, setBtnLoading] = useState(false);
 
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [address, setAddress] = useState("");
+
   const fetchCart = async () => {
     try {
       const res = await getCart();
-      console.log("Cart Data:", res);
-
-      const activeCart = res?.data[res.data.length - 1];
-      //   console.log("Active Cart:", activeCart);
+      const activeCart = res?.data.find((cart) => cart.status === "Active");
       setCartItems(activeCart?.products || []);
     } catch (err) {
       console.error(err);
@@ -36,7 +36,6 @@ function Cart() {
 
   const handleQtyChange = async (productId, qty) => {
     if (qty < 1) return;
-
     await updateItem(productId, qty);
     fetchCart();
   };
@@ -46,13 +45,13 @@ function Cart() {
     fetchCart();
   };
 
-  const handleCheckout = async () => {
+  const submitOrder = async () => {
     setBtnLoading(true);
-
     try {
       const orderData = {
+        shippingAddress: address,
         items: cartItems.map((item) => ({
-          productId: item.productId,
+          product: item.product._id,
           quantity: item.quantity,
         })),
       };
@@ -69,6 +68,7 @@ function Cart() {
       setMsg("❌ Failed to place order");
     } finally {
       setBtnLoading(false);
+      setShowAddressModal(false);
     }
   };
 
@@ -108,11 +108,11 @@ function Cart() {
 
         {cartItems.map((item) => (
           <div
-            key={item.productId}
+            key={item.product._id}
             className="flex items-center gap-4 py-4 border-b dark:border-gray-700"
           >
             <img
-              src={item.product.image || "https://via.placeholder.com/80"}
+              src={item.product.images[0] || "https://via.placeholder.com/80"}
               className="w-20 h-20 rounded-md object-cover"
             />
 
@@ -128,7 +128,7 @@ function Cart() {
               <div className="flex items-center mt-2">
                 <button
                   onClick={() =>
-                    handleQtyChange(item.productId, item.quantity - 1)
+                    handleQtyChange(item.product._id, item.quantity - 1)
                   }
                   className="px-2 py-1 border rounded-l dark:border-gray-600 dark:text-white"
                 >
@@ -139,7 +139,7 @@ function Cart() {
                 </span>
                 <button
                   onClick={() =>
-                    handleQtyChange(item.productId, item.quantity + 1)
+                    handleQtyChange(item.product._id, item.quantity + 1)
                   }
                   className="px-2 py-1 border rounded-r dark:border-gray-600 dark:text-white"
                 >
@@ -149,7 +149,7 @@ function Cart() {
             </div>
 
             <button
-              onClick={() => handleRemove(item.productId, item.quantity)}
+              onClick={() => handleRemove(item.product._id, item.quantity)}
               className="text-red-500 hover:underline text-sm"
             >
               Remove
@@ -157,7 +157,6 @@ function Cart() {
           </div>
         ))}
 
-        {/* Total */}
         <div className="mt-6 flex justify-between text-lg font-semibold dark:text-white">
           <span>Total:</span>
           <span>₹{totalPrice}</span>
@@ -168,13 +167,47 @@ function Cart() {
         )}
 
         <button
-          onClick={handleCheckout}
-          disabled={btnLoading}
-          className="mt-6 w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-medium disabled:opacity-50"
+          onClick={() => setShowAddressModal(true)}
+          className="mt-6 w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-medium"
         >
-          {btnLoading ? "Placing Order..." : "Checkout"}
+          Checkout
         </button>
       </div>
+
+      {/* Address Modal */}
+      {showAddressModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-96 shadow-lg">
+            <h2 className="text-xl font-semibold mb-3 dark:text-white">
+              Enter Shipping Address
+            </h2>
+
+            <textarea
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Enter full delivery address..."
+              className="w-full h-28 p-2 border rounded resize-none dark:bg-gray-700 dark:text-white"
+            />
+
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                onClick={() => setShowAddressModal(false)}
+                className="px-4 py-2 bg-gray-400 text-white rounded"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={submitOrder}
+                disabled={!address.trim() || btnLoading}
+                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded disabled:opacity-50"
+              >
+                {btnLoading ? "Placing..." : "Confirm Order"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

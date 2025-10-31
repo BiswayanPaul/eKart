@@ -77,7 +77,9 @@ const getUserOrders = asyncHandler(async (req, res) => {
     throw new ApiError(404, "No orders found for this user");
   }
 
-  res.status(200).json(new ApiResponse(200, "User orders fetched", orders));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "User orders fetched", orders));
 });
 
 const getOrderById = asyncHandler(async (req, res) => {
@@ -89,7 +91,7 @@ const getOrderById = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Order not found");
   }
 
-  res.status(200).json(new ApiResponse(200, "Order fetched", order));
+  return res.status(200).json(new ApiResponse(200, "Order fetched", order));
 });
 
 const updateOrderStatus = asyncHandler(async (req, res) => {
@@ -108,7 +110,9 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 
   order.status = status;
   await order.save();
-  res.status(200).json(new ApiResponse(true, "Order status updated", order));
+  return res
+    .status(200)
+    .json(new ApiResponse(true, "Order status updated", order));
 });
 
 const cancelOrder = asyncHandler(async (req, res) => {

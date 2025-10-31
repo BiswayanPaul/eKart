@@ -42,4 +42,14 @@ const getCurrentUser = async () => {
   return response.data;
 };
 
-export { login, register, logout, getCurrentUser };
+const refreshToken = async () => {
+  try {
+    const response = await api.post("/auth/refresh-token");
+    return response.data;
+  } catch (error) {
+    console.log("Token Refresh Failed:", error);
+    throw error.response?.data || { message: "Token Refresh Request Failed" };
+  }
+};
+
+export { login, register, logout, getCurrentUser, refreshToken };

@@ -15,8 +15,9 @@ export const addToCart = async (productId, quantity = 1) => {
 // Remove item from cart
 export const removeItem = async (productId, quantity) => {
   try {
+    console.log("Removing Item:", productId, "Quantity:", quantity);
     const response = await api.delete(`/cart/remove/${productId}`, {
-      data: quantity,
+      data: { quantity },
     });
     return response.data;
   } catch (error) {
@@ -30,6 +31,7 @@ export const removeItem = async (productId, quantity) => {
 // Update item quantity
 export const updateItem = async (productId, quantity) => {
   try {
+    console.log("Updating Item:", productId, "Quantity:", quantity);
     const response = await api.put(`/cart/update/${productId}`, { quantity });
     return response.data;
   } catch (error) {

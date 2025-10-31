@@ -65,17 +65,25 @@ const removeItemFromCart = asyncHandler(async (req, res) => {
   const { productId } = req.params;
   const { quantity = 1 } = req.body;
 
+  console.log(userId, productId, quantity);
+
+  console.log("Request to remove:", productId, "Quantity:", quantity);
+
   if (!productId) throw new ApiError(400, "Product ID is required");
 
-  const cart = await Cart.findOne({ user: userId });
+  const cart = await Cart.findOne({
+    user: userId.toString(),
+    status: "Active",
+  });
   if (!cart) throw new ApiError(404, "Cart not found to remove");
 
   // Find the item safely
+  console.log("Current Cart Products:", cart.products);
   const itemIndex = cart.products.findIndex((p) => {
-    const pid =
-      p.product && typeof p.product === "object"
-        ? p.product._id?.toString()
-        : p.product?.toString();
+    console.log("Checking cart item:", p);
+    const pid = p.product.id?.toString();
+
+    console.log("Comparing:", pid, "with", productId);
     return pid === productId;
   });
 
@@ -117,13 +125,15 @@ const removeItemFromCart = asyncHandler(async (req, res) => {
 const updateItemQuantity = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const productId = req.params.productId || req.body.productId;
-  const { quantity } = req.body;
+  const quantity = req.body.quantity || req.body.data?.quantity;
 
   if (quantity <= 0) {
     throw new ApiError(400, "Quantity must be at least 1");
   }
 
-  const cart = await Cart.findOne({ user: userId });
+  console.log("Updating Cart Item:", productId, "Quantity:", quantity, userId);
+
+  const cart = await Cart.findOne({ user: userId, status: "Active" });
   if (!cart) {
     throw new ApiError(404, "Cart not found to update");
   }
