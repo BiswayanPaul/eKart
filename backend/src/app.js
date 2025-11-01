@@ -31,6 +31,10 @@ import { cartRouter } from "./routes/cart.route.js";
 // Order Routes
 import { orderRouter } from "./routes/order.route.js";
 
+app.get("/", (req, res) => {
+  res.send("eKart Backend is running");
+});
+
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/cart", cartRouter);
